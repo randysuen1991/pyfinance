@@ -24,7 +24,7 @@ def _rolling_lstsq(x, y):
 
 
 def _confirm_constant(a):
-    """Confirm `a` has volumn vector of 1s."""
+    """Confirm `a` has volume vector of 1s."""
     return np.any(np.equal(np.ptp(a, axis=0), 1.))
 
 
@@ -108,7 +108,7 @@ class OLS(object):
     (see statsmodels.regression.linear_model.RegressionResults)
 
     The core of the model is calculated with the 'gelsd' LAPACK driver,
-    witin numpy.linalg.lstsq, yielding the coefficients (parameters).  Most
+    within numpy.linalg.lstsq, yielding the coefficients (parameters).  Most
     methods are then a derivation of these coefficients.
 
     Parameters
@@ -319,7 +319,7 @@ class RollingOLS(object):
     (see statsmodels.regression.linear_model.RegressionResults)
 
     The core of the model is calculated with the 'gelsd' LAPACK driver,
-    witin numpy.linalg.lstsq, yielding the coefficients (parameters).  Most
+    within numpy.linalg.lstsq, yielding the coefficients (parameters).  Most
     methods are then a derivation of these coefficients.
 
     Parameters
@@ -441,7 +441,7 @@ class RollingOLS(object):
 
     @property
     def _rsq(self):
-        """The coefficent of determination, R-squared."""
+        """The coefficient of determination, R-squared."""
         return self._ss_reg / self._ss_tot
 
     @property
@@ -602,7 +602,7 @@ class RollingOLS(object):
 
     @property
     def rsq(self):
-        """The coefficent of determination, R-squared."""
+        """The coefficient of determination, R-squared."""
         return self._rsq
 
     @property
@@ -672,6 +672,12 @@ class RollingOLS(object):
 #    @property
 #    def beta(self):
 #        return DataFrame(super(PandasRollingOLS, self).beta())
+
+    def predict(self, series):
+        parameters = np.hstack((self.alpha[0:-1].values.reshape(-1, 1), self.beta[0:-1].values))
+        extended_x_test = np.hstack((np.ones(shape=(series.shape[0], 1)), series))
+        multiply = np.multiply(extended_x_test, parameters)
+        return multiply[:, 0] + multiply[:, 1]
 
 
 class PandasRollingOLS(RollingOLS):
@@ -792,7 +798,7 @@ class PandasRollingOLS(RollingOLS):
 
     @property
     def rsq(self):
-        """The coefficent of determination, R-squared."""
+        """The coefficient of determination, R-squared."""
         return self._wrap_series(stat='_rsq')
 
     @property
@@ -837,7 +843,7 @@ class PandasRollingOLS(RollingOLS):
 
     @property
     def tstat_beta(self):
-        """The t-statistics of the parameters, excl. the intecept."""
+        """The t-statistics of the parameters, excl. the intercept."""
         return self._wrap_dataframe(stat='_tstat_beta')
 
     @property
